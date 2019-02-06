@@ -6,11 +6,16 @@ import argparse
 import imutils
 import cv2 as cv
 import model
+import os
 print("Required packages are available")
+print ("Project root" + os.path.dirname(os.path.dirname(__file__)))
+
+root = os.path.dirname(os.path.dirname(__file__))
+
 
 def getDimensions(frame):
-    height = frame.get(4)
-    width = frame.get(3)
+    height = frame.get(4) #4 stands for height attribute of frame as stated in openCv docs
+    width = frame.get(3)  #3 stands for width attribute of frame as stated in openCv docs  
     bottomBorder = int(height*0.25)
     topBorder = int(height*0.9)
     leftBorder = int(5*(width/16))
@@ -31,11 +36,17 @@ def removeNoiseFromFrame(frame):
     return frameMask
 
 i = 1
+open(root + '/assets/tests/out.txt', 'w').flush() #flush file contents
+outFile = open(root + '/assets/tests/out.txt', 'a') #append text to file
+outFile.write('RA-87-2012, Igor Dojcinovic\n')
+outFile.write('file,count\n')
+outFile.close()    
 while(i < 11):    
+    outFile = open(root + '/assets/tests/out.txt', 'a')
     detectedObjects = []
     pedestriansCrossed = []
-
-    stream = cv.VideoCapture('D:/Fakultet/SoftProject/SoftComputingProject/assets/videos/video' + str( i ) + '.mp4')    
+            
+    stream = cv.VideoCapture(root + '/assets/videos/video' + str( i ) + '.mp4')    
 
     platoeHeight, platoeWidth, platoeBottomSide, platoeTopSide, _, _ = getDimensions(stream)
 
@@ -75,7 +86,9 @@ while(i < 11):
         if cv.waitKey(1) & 0xFF == ord('q'):
             break
 
-    print("Number of pedestrians in video-" + str(i) + " is: " + str(len(pedestriansCrossed)))
+    print("Number of pedestrians in video-" + str(i) + " is: " + str(len(pedestriansCrossed)))    
+    outFile.writelines('video'+ str(i) + '.mp4,' + str(len(pedestriansCrossed)) + '\n')     #adding results to nw lien
+    outFile.close()
     stream.release()
     cv.destroyAllWindows()
     i += 1
